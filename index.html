@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Midas Touch: Exposing Venture Capital's Golden Circle</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #ffd700 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease;
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 2s ease;
+        }
+
+        .loading-text {
+            font-size: 1.5rem;
+            color: #ffd700;
+            margin-bottom: 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        .progress-bar {
+            width: 300px;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .hero-section {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 8rem);
+            font-weight: bold;
+            background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s ease-in-out infinite;
+            text-align: center;
+            text-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
+        }
+
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 3vw, 2rem);
+            margin-top: 1rem;
+            text-align: center;
+            opacity: 0.8;
+            max-width: 800px;
+        }
+
+        .network-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .revelation-section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            transform: translateY(50px);
+            opacity: 0;
+            transition: all 0.8s ease;
+            cursor: pointer;
+        }
+
+        .stat-card.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: scale(1.02);
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.2);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ffd700;
+            display: block;
+        }
+
+        .vc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .vc-card {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vc-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .vc-card:hover::before {
+            left: 100%;
+        }
+
+        .vc-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.3);
+        }
+
+        .deal-timeline {
+            position: relative;
+            margin: 4rem 0;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #ffd700, rgba(255, 215, 0, 0.1));
+            transform: translateX(-50%);
+        }
+
+        .deal-item {
+            display: flex;
+            align-items: center;
+            margin: 3rem 0;
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.8s ease;
+        }
+
+        .deal-item.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .deal-item:nth-child(even) {
+            flex-direction: row-reverse;
+            transform: translateX(50px);
+        }
+
+        .deal-item:nth-child(even).visible {
+            transform: translateX(0);
+        }
+
+        .deal-content {
+            flex: 1;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 0 2rem;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .deal-amount {
+            font-size: 2rem;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .bias-detector {
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.2) 0%, rgba(139, 0, 0, 0.1) 100%);
+            border: 2px solid rgba(220, 20, 60, 0.5);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem 0;
+            text-align: center;
+        }
+
+        .bias-detector h2 {
+            color: #dc143c;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .interactive-element {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            padding: 1rem 2rem;
+            margin: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .interactive-element:hover {
+            background: rgba(255, 215, 0, 0.3);
+            transform: scale(1.05);
+        }
+
+        .call-to-action {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #000;
+            padding: 4rem 2rem;
+            text-align: center;
+            margin: 4rem 0;
+            border-radius: 20px;
+        }
+
+        .cta-button {
+            background: #000;
+            color: #ffd700;
+            padding: 1rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 1rem;
+        }
+
+        .cta-button:hover {
+            background: #333;
+            transform: scale(1.1);
+        }
+
+        .section-title {
+            font-size: 3rem;
+            margin: 4rem 0 2rem 0;
+            text-align: center;
+            background: linear-gradient(45deg, #ffd700, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+            
+            .vc-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .timeline-line {
+                left: 20px;
+            }
+            
+            .deal-item,
+            .deal-item:nth-child(even) {
+                flex-direction: column;
+                transform: translateX(0);
+            }
+            
+            .deal-content {
+                margin: 1rem 0;
+            }
+        }
+
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ffd700;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 10s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-10vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="custom-cursor"></div>
+    
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-text">Accessing Private Networks...</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <div class="floating-particles" id="particles"></div>
+
+    <section class="hero-section">
+        <canvas class="network-background" id="networkCanvas"></canvas>
+        <h1 class="hero-title">THE MIDAS TOUCH</h1>
+        <p class="hero-subtitle">40 individuals control $2.4 trillion in startup funding. These are their stories.</p>
+    </section>
+
+    <section class="revelation-section">
+        <h2 class="section-title">The Golden Circle</h2>
+        
+        <div class="stat-card" data-reveal="true">
+            <span class="stat-number">40</span>
+            <h3>People Control More Startup Funding Than 40 Countries' GDP Combined</h3>
+            <p>The Forbes Midas List represents the most exclusive club in technology. These 40 venture capitalists don't just invest in the future—they decide what the future looks like.</p>
+        </div>
+
+        <div class="stat-card" data-reveal="true">
+            <span class="stat-number">47x</span>
+            <h3>More Likely to Get VC Funding if You Went to Stanford</h3>
+            <p>Your alma mater matters more than your idea. The same elite universities that produce VCs also produce the founders they fund.</p>
+        </div>
+
+        <div class="stat-card" data-reveal="true">
+            <span class="stat-number">3%</span>
+            <h3>Of VC Funding Goes to Female Founders—And It's Getting Worse</h3>
+            <p>Despite decades of "diversity initiatives," the gender gap in venture funding continues to widen.</p>
+        </div>
+
+        <h2 class="section-title">The Power Players</h2>
+        
+        <div class="vc-grid">
+            <div class="vc-card" onclick="revealVC('a16z')">
+                <h3>Andreessen Horowitz (a16z)</h3>
+                <p><strong>Key Players:</strong> Marc Andreessen, Ben Horowitz, Scott Shleifer</p>
+                <p><strong>Recent Wins:</strong> Mistral AI ($415M), Figure AI ($675M)</p>
+                <p><strong>Power Score:</strong> ⭐⭐⭐⭐⭐</p>
+            </div>
+
+            <div class="vc-card" onclick="revealVC('sequoia')">
+                <h3>Sequoia Capital</h3>
+                <p><strong>Key Players:</strong> Roelof Botha, Alfred Lin, Ravi Gupta</p>
+                <p><strong>Recent Wins:</strong> Instacart IPO ($10B valuation)</p>
+                <p><strong>Power Score:</strong> ⭐⭐⭐⭐⭐</p>
+            </div>
+
+            <div class="vc-card" onclick="revealVC('lightspeed')">
+                <h3>Lightspeed Venture Partners</h3>
+                <p><strong>Key Players:</strong> Nicole Quinn, Arnon Dinur</p>
+                <p><strong>Recent Wins:</strong> Wiz ($10B valuation), Mistral AI</p>
+                <p><strong>Power Score:</strong> ⭐⭐⭐⭐</p>
+            </div>
+
+            <div class="vc-card" onclick="revealVC('khosla')">
+                <h3>Khosla Ventures</h3>
+                <p><strong>Key Players:</strong> Vinod Khosla, Samir Kaul</p>
+                <p><strong>Recent Wins:</strong> Instacart (Pre-IPO), OpenAI investments</p>
+                <p><strong>Power Score:</strong> ⭐⭐⭐⭐</p>
+            </div>
+        </div>
+
+        <div class="bias-detector">
+            <h2>🚨 BIAS DETECTOR ACTIVATED 🚨</h2>
+            <p>Click on different founder profiles to see how funding probability changes:</p>
+            
+            <div class="interactive-element" onclick="calculateBias('stanford-male')">
+                Stanford Graduate, Male, Tech Background
+            </div>
+            <div class="interactive-element" onclick="calculateBias('community-female')">
+                Community College, Female, Healthcare Background
+            </div>
+            <div class="interactive-element" onclick="calculateBias('ivy-minority')">
+                Ivy League, Underrepresented Minority, Fintech
+            </div>
+            
+            <div id="biasResult" style="margin-top: 2rem; font-size: 1.5rem;"></div>
+        </div>
+
+        <h2 class="section-title">The Deal Timeline</h2>
+        
+        <div class="deal-timeline">
+            <div class="timeline-line"></div>
+            
+            <div class="deal-item" data-reveal="true">
+                <div class="deal-content">
+                    <div class="deal-amount">$675M</div>
+                    <h3>Figure AI - Humanoid Robotics</h3>
+                    <p><strong>Feb 2024:</strong> Microsoft, OpenAI, Nvidia, Jeff Bezos fund the future of robotics</p>
+                    <p><strong>The Pattern:</strong> Same investors, same playbook, same Silicon Valley insiders</p>
+                </div>
+            </div>
+
+            <div class="deal-item" data-reveal="true">
+                <div class="deal-content">
+                    <div class="deal-amount">$415M</div>
+                    <h3>Mistral AI - European AI Champion</h3>
+                    <p><strong>Dec 2023:</strong> a16z leads massive round for French AI startup</p>
+                    <p><strong>The Pattern:</strong> US VCs colonizing European innovation</p>
+                </div>
+            </div>
+
+            <div class="deal-item" data-reveal="true">
+                <div class="deal-content">
+                    <div class="deal-amount">$28B</div>
+                    <h3>Cisco Acquires Splunk</h3>
+                    <p><strong>Mar 2024:</strong> Largest enterprise software acquisition</p>
+                    <p><strong>The Pattern:</strong> Big Tech consolidating VC-backed innovation</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="call-to-action">
+            <h2>Your Funding Probability Calculator</h2>
+            <p>Enter your background and see how the system is rigged:</p>
+            
+            <button class="cta-button" onclick="openCalculator()">Calculate My Odds</button>
+            <button class="cta-button" onclick="showAlternatives()">Find Alternative Funding</button>
+            <button class="cta-button" onclick="shareStory()">Share This Story</button>
+        </div>
+    </section>
+
+    <script>
+        // Loading screen animation
+        let progress = 0;
+        const loadingInterval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(loadingInterval);
+                setTimeout(() => {
+                    document.getElementById('loadingScreen').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('loadingScreen').style.display = 'none';
+                    }, 2000);
+                }, 1000);
+            }
+            document.getElementById('progressFill').style.width = progress + '%';
+        }, 200);
+
+        // Custom cursor
+        const cursor = document.querySelector('.custom-cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Floating particles
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * window.innerWidth + 'px';
+            particle.style.animationDelay = Math.random() * 10 + 's';
+            document.getElementById('particles').appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 10000);
+        }
+
+        setInterval(createParticle, 500);
+
+        // Network canvas animation
+        const canvas = document.getElementById('networkCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const nodes = [];
+        const connections = [];
+        
+        // Create network nodes
+        for (let i = 0; i < 50; i++) {
+            nodes.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                size: Math.random() * 3 + 1
+            });
+        }
+
+        function animateNetwork() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Update nodes
+            nodes.forEach(node => {
+                node.x += node.vx;
+                node.y += node.vy;
+                
+                if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
+                if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
+                
+                // Draw node
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, node.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 215, 0, 0.6)';
+                ctx.fill();
+            });
+            
+            // Draw connections
+            nodes.forEach((node1, i) => {
+                nodes.slice(i + 1).forEach(node2 => {
+                    const distance = Math.sqrt(
+                        Math.pow(node1.x - node2.x, 2) + Math.pow(node1.y - node2.y, 2)
+                    );
+                    
+                    if (distance < 100) {
+                        ctx.beginPath();
+                        ctx.moveTo(node1.x, node1.y);
+                        ctx.lineTo(node2.x, node2.y);
+                        ctx.strokeStyle = `rgba(255, 215, 0, ${0.3 - distance / 300})`;
+                        ctx.stroke();
+                    }
+                });
+            });
+            
+            requestAnimationFrame(animateNetwork);
+        }
+        
+        animateNetwork();
+
+        // Scroll reveal animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('[data-reveal="true"]').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Interactive functions
+        function revealVC(vcName) {
+            const messages = {
+                'a16z': 'Andreessen Horowitz has invested in 18 of the top 50 most valuable startups. Their portfolio companies have a combined valuation of over $200 billion.',
+                'sequoia': 'Sequoia Capital has backed Apple, Google, WhatsApp, and Airbnb. They have more billion-dollar exits than any other VC firm.',
+                'lightspeed': 'Lightspeed has invested in Snapchat, Epic Games, and Affirm. They control key infrastructure for the creator economy.',
+                'khosla': 'Khosla Ventures focuses on "black swan" technologies. Vinod Khosla personally has a net worth of $1.4 billion from VC returns.'
+            };
+            
+            alert(messages[vcName] || 'This VC firm controls billions in startup funding and shapes entire industries.');
+        }
+
+        function calculateBias(profile) {
+            const probabilities = {
+                'stanford-male': { chance: '23%', color: '#00ff00' },
+                'community-female': { chance: '0.4%', color: '#ff0000' },
+                'ivy-minority': { chance: '8%', color: '#ffaa00' }
+            };
+            
+            const result = probabilities[profile];
+            const resultDiv = document.getElementById('biasResult');
+            resultDiv.innerHTML = `
+                <div style="color: ${result.color}; font-weight: bold;">
+                    Funding Probability: ${result.chance}
+                </div>
+                <p>This isn't just data—it's your future being decided by someone else's bias.</p>
+            `;
+        }
+
+        function openCalculator() {
+            alert('The real calculator would show how your education, gender, race, and location affect your funding chances. The results would shock you.');
+        }
+
+        function showAlternatives() {
+            alert('Alternative funding sources: Angel investors, crowdfunding, revenue-based financing, government grants, and international VCs breaking the Silicon Valley monopoly.');
+        }
+
+        function shareStory() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'The Midas Touch: Exposing VC Bias',
+                    text: '40 people control $2.4 trillion in startup funding. See how the system is rigged.',
+                    url: window.location.href
+                });
+            } else {
+                alert('Share this story: 40 people control more startup funding than 40 countries\' GDP. The system is rigged. #MidasTouch #VCBias');
+            }
+        }
+
+        // Sound effects (optional - commented out to avoid autoplay issues)
+        /*
+        function playSound(type) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = type === 'reveal' ? 800 : 400;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+        */
+
+        // Add click sound effects to interactive elements
+        document.querySelectorAll('.interactive-element, .vc-card, .cta-button').forEach(el => {
+            el.addEventListener('click', () => {
+                // playSound('click');
+                el.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    el.style.transform = '';
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
