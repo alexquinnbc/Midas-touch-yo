@@ -1,1 +1,429 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVAFLUX - The Pulse of Innovation (Conceptual Sketch)</title>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 5px rgba(255,255,255,0.2); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,255,255,0.5); }
+            100% { transform: scale(1); box-shadow: 0 0 5px rgba(255,255,255,0.2); }
+        }
+        @keyframes starShine {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+        @keyframes flowLine {
+            from { stroke-dashoffset: 1000; }
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes textMorph {
+            0% { opacity: 0; transform: translateY(20px) scale(0.8); letter-spacing: 5px; }
+            100% { opacity: 1; transform: translateY(0) scale(1); letter-spacing: normal; }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #0a0a1f; /* Deep space blue/purple */
+            color: #e0e0ff;
+            overflow-x: hidden;
+        }
+
+        .nova-scene {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 50px 20px;
+            box-sizing: border-box;
+            position: relative;
+            opacity: 0; /* Hidden by default, revealed by JS */
+            transition: opacity 1s ease-in-out;
+            border-bottom: 1px dashed rgba(255,255,255,0.1);
+        }
+        .nova-scene.visible {
+            opacity: 1;
+        }
+
+        .scene-title {
+            font-size: 3em;
+            font-weight: 300;
+            margin-bottom: 20px;
+            animation: textMorph 1.5s ease-out forwards;
+            color: #9effff; /* Cyan highlight */
+        }
+        .scene-subtitle {
+            font-size: 1.5em;
+            font-weight: 300;
+            margin-bottom: 40px;
+            max-width: 800px;
+            line-height: 1.6;
+            animation: textMorph 2s 0.5s ease-out forwards;
+            opacity:0; animation-fill-mode:forwards; /* Start hidden */
+        }
+        .scene-interaction-hint {
+            font-size: 0.9em;
+            color: #aaaacc;
+            margin-top: 30px;
+            font-style: italic;
+            opacity:0; animation: fadeIn 1s 2.5s forwards;
+        }
+
+        /* Scene 1: Opening Hook */
+        #scene1 { background: radial-gradient(circle, #1a1a3f 0%, #0a0a1f 70%); }
+        .idea-spark {
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 0 0 15px white, 0 0 30px #aaaaff, 0 0 45px #8888ff;
+            animation: pulse 3s infinite ease-in-out, fadeIn 2s 1s forwards;
+            cursor: pointer;
+            opacity:0;
+            margin-bottom: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .idea-spark:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 25px white, 0 0 50px #ccccff, 0 0 75px #aaaaff;
+        }
+        .compelling-question {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #ffffff;
+            margin-top: 20px;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        /* Scene 2: Rising Tension */
+        #scene2 { background: linear-gradient(135deg, #101028 0%, #181838 100%); }
+        .particle-container {
+            position: relative;
+            width: 80%;
+            height: 300px; /* Adjust as needed */
+            margin: 30px auto;
+            /* border: 1px solid rgba(255,255,255,0.1); For visualization */
+        }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(200, 200, 255, 0.8);
+            box-shadow: 0 0 5px rgba(200, 200, 255, 0.8);
+            animation: starShine 3s infinite ease-in-out;
+        }
+        .vc-star {
+            background-color: rgba(255, 223, 186, 0.9); /* Light gold for VCs */
+            box-shadow: 0 0 10px rgba(255, 223, 186, 0.9), 0 0 15px rgba(255, 223, 186, 0.5);
+            animation-duration: 2.5s; /* VCs shine slightly different */
+            cursor: grab;
+        }
+        .connection-line {
+            stroke: rgba(150, 150, 255, 0.3);
+            stroke-width: 1px;
+            stroke-dasharray: 50; /* Make it dashed */
+            animation: flowLine 10s linear infinite;
+        }
+        .funding-burst {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: gold;
+            border-radius: 50%;
+            box-shadow: 0 0 10px gold, 0 0 20px yellow;
+            opacity: 0;
+            /* JS will handle animation */
+        }
+
+        /* Scene 3: Climax */
+        #scene3 { background: radial-gradient(ellipse at center, #200030 0%, #0a0010 100%); }
+        .galaxy-network {
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            margin: 20px auto;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            /* SVG or Canvas would go here for a real network */
+            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232a2a5f' fill-opacity='0.2'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c-5.523 0-10-4.477-10-10zm0 0c0 5.523-4.477 10-10 10S30 55.523 30 50s4.477-10 10-10c5.523 0 10 4.477 10 10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c-5.523 0-10-4.477-10-10zm0 0c0 5.523-4.477 10-10 10S-10 15.523-10 10s4.477-10 10-10c5.523 0 10 4.477 10 10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .filter-button {
+            background-color: #8a2be2; /* Purple */
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .filter-button:hover {
+            background-color: #7b1fa2;
+            transform: scale(1.05);
+        }
+        .shockwave-text {
+            font-size: 1.8em;
+            color: #ff69b4; /* Hot pink for shockwave */
+            margin-top: 20px;
+            opacity:0; animation: fadeIn 1s forwards;
+        }
+
+        /* Scene 4: Resolution */
+        #scene4 { background: linear-gradient(to bottom, #001020, #002030); }
+        .resolution-text {
+            font-size: 1.3em;
+            max-width: 700px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            animation: textMorph 2s ease-out forwards;
+        }
+        .generative-art-placeholder {
+            width: 200px;
+            height: 200px;
+            border: 2px dashed #555588;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            color: #8888aa;
+            opacity:0; animation: fadeIn 1s 1s forwards;
+        }
+        .final-call-to-action {
+            font-size: 1.5em;
+            color: #79c6ff;
+            font-weight: bold;
+            margin-top:30px;
+            opacity:0; animation: fadeIn 1s 1.5s forwards;
+        }
+
+        /* Scroll Indicator (Optional) */
+        .scroll-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 1.2em;
+            opacity: 0.7;
+            animation: pulse 2s infinite ease-in-out;
+        }
+        .scroll-indicator span { display: block; transform: rotate(90deg); }
+
+    </style>
+</head>
+<body>
+
+    <div id="scene1" class="nova-scene">
+        <div class="idea-spark" id="ideaSpark"></div>
+        <h1 class="scene-title" id="mainTitle">The Genesis Spark</h1>
+        <p class="scene-subtitle" id="mainSubtitle">Every revolution begins with a single, brilliant thought. But how does it ignite a universe of change?</p>
+        <p class="compelling-question" id="compellingQuestion">Where does innovation truly begin?</p>
+        <p class="scene-interaction-hint">Hover over the spark. Scroll to continue the journey.</p>
+    </div>
+
+    <div id="scene2" class="nova-scene">
+        <h1 class="scene-title">Rising Tension</h1>
+        <p class="scene-subtitle">Ideas attract energy. Capital seeks brilliance. Watch as connections form, and the first constellations of innovation emerge.</p>
+        <div class="particle-container" id="particleContainer">
+            <!-- Particles and VCs will be added by JS -->
+            <svg width="100%" height="100%" id="connectionSvg" style="position:absolute; top:0; left:0; pointer-events:none;">
+                <!-- Connection lines will be added by JS -->
+            </svg>
+        </div>
+        <p class="scene-interaction-hint">Observe the flow. What patterns do you see? (Conceptual: Drag VCs to Ideas)</p>
+    </div>
+
+    <div id="scene3" class="nova-scene">
+        <h1 class="scene-title">Climax</h1>
+        <p class="scene-subtitle">The innovation galaxy is alive! A vibrant network of companies, investors, and ideas. But disruptive forces can reshape everything in an instant.</p>
+        <div class="galaxy-network" id="galaxyNetwork">
+            <p style="padding-top:150px; opacity:0.5;">[Conceptual: A dynamic, interactive network visualization would appear here.]</p>
+        </div>
+        <div>
+            <button class="filter-button" onclick="triggerShockwave('AI')">Filter: The AI Singularity</button>
+            <button class="filter-button" onclick="triggerShockwave('Climate Shift')">Filter: The Climate Shift</button>
+        </div>
+        <p class="shockwave-text" id="shockwaveText" style="display:none;">A new order emerges!</p>
+        <p class="scene-interaction-hint">Select a disruptive force. Witness the transformation.</p>
+    </div>
+
+    <div id="scene4" class="nova-scene">
+        <h1 class="scene-title">Resolution</h1>
+        <p class="resolution-text">
+            Innovation is not a distant star. It's a network we all shape.
+            Every investment, every idea, every connection shifts this cosmic dance.
+            The future is not written in the stars; it's ignited by the sparks within us.
+        </p>
+        <div class="generative-art-placeholder">
+            [Your Unique Exploration Snapshot]
+        </div>
+        <p class="final-call-to-action">What future will YOU ignite?</p>
+        <p class="scene-interaction-hint">Reflect. Explore again. The universe awaits.</p>
+    </div>
+
+    <div class="scroll-indicator" id="scrollIndicator"><span>></span></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const scenes = document.querySelectorAll('.nova-scene');
+            const ideaSpark = document.getElementById('ideaSpark');
+            const compellingQuestion = document.getElementById('compellingQuestion');
+            const particleContainer = document.getElementById('particleContainer');
+            const connectionSvg = document.getElementById('connectionSvg');
+            const shockwaveTextEl = document.getElementById('shockwaveText');
+            const scrollIndicator = document.getElementById('scrollIndicator');
+
+            let sparkClicked = false;
+
+            // --- Scene 1 Interaction ---
+            if (ideaSpark) {
+                ideaSpark.addEventListener('mouseover', () => {
+                    if (!sparkClicked) compellingQuestion.style.opacity = '1';
+                });
+                ideaSpark.addEventListener('click', () => {
+                    sparkClicked = true;
+                    ideaSpark.style.transform = 'scale(1.5)';
+                    ideaSpark.style.boxShadow = '0 0 30px white, 0 0 60px #ccccff, 0 0 90px #aaaaff';
+                    compellingQuestion.textContent = "It begins with connection...";
+                    compellingQuestion.style.opacity = '1';
+                    // Conceptually, this would trigger Scene 2 elements or transitions
+                });
+            }
+
+            // --- Scene 2: Simple Particle & VC simulation ---
+            if (particleContainer) {
+                const numIdeas = 15;
+                const numVCs = 5;
+                const particles = [];
+
+                for (let i = 0; i < numIdeas; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    p.style.width = p.style.height = (Math.random() * 5 + 5) + 'px'; // 5-10px
+                    p.style.left = Math.random() * 90 + '%';
+                    p.style.top = Math.random() * 90 + '%';
+                    p.style.animationDelay = Math.random() * 2 + 's';
+                    particleContainer.appendChild(p);
+                    particles.push({el: p, type: 'idea', x: parseFloat(p.style.left), y: parseFloat(p.style.top)});
+                }
+                for (let i = 0; i < numVCs; i++) {
+                    const vc = document.createElement('div');
+                    vc.className = 'particle vc-star';
+                    vc.style.width = vc.style.height = (Math.random() * 10 + 10) + 'px'; // 10-20px
+                    vc.style.left = Math.random() * 85 + '%'; // Keep VCs a bit more centered
+                    vc.style.top = Math.random() * 85 + '%';
+                    vc.style.animationDelay = Math.random() * 2 + 's';
+                    particleContainer.appendChild(vc);
+                    particles.push({el: vc, type: 'vc', x: parseFloat(vc.style.left), y: parseFloat(vc.style.top)});
+                }
+
+                // Simple conceptual connections
+                const vcs = particles.filter(p => p.type === 'vc');
+                const ideas = particles.filter(p => p.type === 'idea');
+                for(let i=0; i < Math.min(3, vcs.length); i++) { // Connect first few VCs to random ideas
+                    if (!vcs[i] || ideas.length === 0) continue;
+                    const idea1 = ideas[Math.floor(Math.random() * ideas.length)];
+                    const idea2 = ideas[Math.floor(Math.random() * ideas.length)];
+                    if (idea1) createConnectionLine(vcs[i], idea1);
+                    if (idea2 && idea1 !== idea2) createConnectionLine(vcs[i], idea2);
+                }
+            }
+
+            function createConnectionLine(p1, p2) {
+                if (!connectionSvg || !p1 || !p2) return;
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                // Approximate center of particles. For real app, use getBoundingClientRect.
+                // These percentages need to be converted to SVG coords if SVG has fixed size.
+                // For simplicity, assuming SVG covers particleContainer and uses percentages too (which is not standard for line x1,y1).
+                // This part is highly conceptual for a single file.
+                const p1ElRect = p1.el.getBoundingClientRect();
+                const p2ElRect = p2.el.getBoundingClientRect();
+                const containerRect = particleContainer.getBoundingClientRect();
+
+                // Calculate relative positions. This is still tricky without a fixed SVG viewport.
+                // A proper solution would use a library or more complex coordinate transformations.
+                // This is a simplified placeholder for the *idea* of a line.
+                line.setAttribute('x1', `${p1.x + parseFloat(p1.el.style.width)/2}%`);
+                line.setAttribute('y1', `${p1.y + parseFloat(p1.el.style.height)/2}%`);
+                line.setAttribute('x2', `${p2.x + parseFloat(p2.el.style.width)/2}%`);
+                line.setAttribute('y2', `${p2.y + parseFloat(p2.el.style.height)/2}%`);
+                line.setAttribute('class', 'connection-line');
+                connectionSvg.appendChild(line);
+            }
+
+
+            // --- Scene 3: Climax Interaction ---
+            window.triggerShockwave = (forceName) => {
+                const galaxyNetwork = document.getElementById('galaxyNetwork');
+                if (galaxyNetwork) {
+                    // Conceptual: Change background or add an overlay
+                    galaxyNetwork.style.transition = 'background-color 0.5s ease, transform 0.5s ease';
+                    if (forceName === 'AI') {
+                        galaxyNetwork.style.backgroundColor = 'rgba(0, 150, 255, 0.3)'; // Electric blue hue
+                    } else if (forceName === 'Climate Shift') {
+                        galaxyNetwork.style.backgroundColor = 'rgba(0, 200, 100, 0.3)'; // Green hue
+                    }
+                    galaxyNetwork.style.transform = 'scale(1.05)';
+                    setTimeout(() => galaxyNetwork.style.transform = 'scale(1)', 500);
+                }
+                if(shockwaveTextEl) {
+                    shockwaveTextEl.textContent = `The ${forceName} force reshapes the galaxy!`;
+                    shockwaveTextEl.style.display = 'block';
+                    shockwaveTextEl.style.opacity = '0'; // Reset for animation
+                    // Force reflow for re-animation
+                    void shockwaveTextEl.offsetWidth;
+                    shockwaveTextEl.style.animation = 'fadeIn 1s forwards';
+                }
+            };
+
+
+            // --- Scroll-based Scene Visibility ---
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.3 // Scene becomes visible when 30% is in viewport
+            };
+
+            const observerCallback = (entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        if(entry.target.id === 'scene4') { // If last scene is visible
+                            if (scrollIndicator) scrollIndicator.style.display = 'none';
+                        } else {
+                            if (scrollIndicator) scrollIndicator.style.display = 'block';
+                        }
+                    } else {
+                        // Optionally remove 'visible' if you want animations to replay on scroll back
+                        // entry.target.classList.remove('visible');
+                    }
+                });
+            };
+            const sceneObserver = new IntersectionObserver(observerCallback, observerOptions);
+            scenes.forEach(scene => sceneObserver.observe(scene));
+
+            // Initial check for the first scene (usually already in view)
+            if (scenes.length > 0 && scenes[0].getBoundingClientRect().top < window.innerHeight * 0.7) {
+                 scenes[0].classList.add('visible');
+            }
+             // Hide scroll indicator if already at bottom (e.g. short page)
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) { // 50px buffer
+                if (scrollIndicator) scrollIndicator.style.display = 'none';
+            }
+
+        });
+    </script>
+</body>
+</html>
