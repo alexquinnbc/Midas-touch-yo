@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global VC Pulse Interactive</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            background-color: #e9ecef;
+            padding: 10px 0;
+        }
+        nav button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+        nav button:hover, nav button.active {
+            background-color: #0056b3;
+        }
+        .content-section {
+            display: none; /* Hidden by default */
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .content-section.active {
+            display: block;
+        }
+        .filters {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        .filters label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .filters select, .filters input[type="text"] {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .deals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .deal-card {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease-in-out;
+        }
+        .deal-card:hover {
+            transform: translateY(-5px);
+        }
+        .deal-card h3 {
+            margin-top: 0;
+            color: #007bff;
+            font-size: 1.3em;
+        }
+        .deal-card p {
+            margin: 8px 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        .deal-card strong {
+            color: #555;
+        }
+        .deal-card .source-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .deal-card .source-link:hover {
+            text-decoration: underline;
+        }
+        .disclaimer {
+            font-size: 0.8em;
+            color: #6c757d;
+            margin-top: 30px;
+            text-align: center;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .vc-list li, .theme-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+         .vc-list li:hover, .theme-list li:hover{
+            background-color: #f0f0f0;
+         }
+        .theme-content h2 { color: #007bff; margin-top: 0;}
+        .theme-content p { line-height: 1.6;}
+        .theme-content ul { list-style: disc; padding-left: 20px;}
+
+        /* Simple Modal for Deal Details */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 25px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 700px;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+        .modal-close:hover,
+        .modal-close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Global VC Pulse Interactive</h1>
+    </header>
+
+    <div class="container">
+        <nav>
+            <button id="nav-deals" class="active" onclick="showSection('deals-explorer')">Deals Explorer</button>
+            <button id="nav-vcs" onclick="showSection('vc-insights')">VC Insights</button>
+            <button id="nav-themes" onclick="showSection('thematic-stories')">Thematic Stories</button>
+            <button id="nav-about" onclick="showSection('about')">About</button>
+        </nav>
+
+        <!-- Deals Explorer Section -->
+        <section id="deals-explorer" class="content-section active">
+            <h2>Explore Venture Capital Deals</h2>
+            <div class="filters">
+                <div>
+                    <label for="search-term">Search:</label>
+                    <input type="text" id="search-term" placeholder="Company, VC, Sector...">
+                </div>
+                <div>
+                    <label for="filter-region">Region:</label>
+                    <select id="filter-region">
+                        <option value="">All Regions</option>
+                        <!-- Options will be populated by JS -->
+                    </select>
+                </div>
+                <div>
+                    <label for="filter-sector">Sector:</label>
+                    <select id="filter-sector">
+                        <option value="">All Sectors</option>
+                        <!-- Options will be populated by JS -->
+                    </select>
+                </div>
+                 <div>
+                    <label for="filter-deal-type">Deal Type:</label>
+                    <select id="filter-deal-type">
+                        <option value="">All Types</option>
+                        <option value="Funding">Funding</option>
+                        <option value="M&A">M&A</option>
+                        <option value="IPO">IPO</option>
+                    </select>
+                </div>
+            </div>
+            <div id="deals-grid" class="deals-grid">
+                <!-- Deal cards will be inserted here by JS -->
+            </div>
+        </section>
+
+        <!-- VC Insights Section -->
+        <section id="vc-insights" class="content-section">
+            <h2>Venture Capital Firm Insights (Simplified)</h2>
+            <p>This section provides a simplified overview of VCs mentioned in our dataset. Click a VC to see related deals (filters Deals Explorer).</p>
+            <input type="text" id="vc-search" placeholder="Search VCs..." style="width: 100%; padding: 10px; margin-bottom:10px; box-sizing: border-box;">
+            <ul id="vc-list" class="vc-list">
+                <!-- VC list will be populated by JS -->
+            </ul>
+        </section>
+
+        <!-- Thematic Stories Section -->
+        <section id="thematic-stories" class="content-section">
+            <h2>Thematic Data Stories</h2>
+            <p>Explore key trends and narratives emerging from the global VC landscape.</p>
+            <div id="theme-list-container">
+                 <ul id="theme-list" class="theme-list">
+                    <!-- Theme titles will be populated by JS -->
+                </ul>
+            </div>
+            <div id="theme-content-display" style="margin-top:20px;">
+                <!-- Selected theme content will be displayed here -->
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="content-section">
+            <h2>About This Interactive Experience</h2>
+            <p>This interactive experience is inspired by the rigorous analysis behind initiatives like the Forbes Midas List. It aims to provide a glimpse into the publicly visible currents shaping today's venture capital ecosystem using publicly available data, news reports, and press releases.</p>
+            <p><strong>Disclaimer:</strong> The data presented here is for illustrative and informational purposes only. It is based on a curated selection of publicly available information and does not replicate the proprietary, confidential data, extensive verification, or rigorous methodology used for official industry rankings like the Midas List. Valuations, deal specifics, and investor involvement are as reported publicly and may vary or be incomplete. This tool is not intended for financial advice.</p>
+        </section>
+
+        <div class="disclaimer">
+            Data is illustrative and based on publicly available information. Not for financial advice.
+        </div>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="dealModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">×</span>
+            <div id="modal-body-content"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- EMBEDDED DEAL DATA ---
+        // (Reduced dataset for brevity in this example. Expand with your full dataset.)
+        const dealsData = [
+            { id:1, companyName: "Mistral AI", sector: "AI", region: "Europe (France)", date: "Dec 2023", amount: "€385M ($415M) funding", valuation: "~$2B", dealType: "Funding", leadVCs: "Andreessen Horowitz (a16z), Lightspeed Venture Partners", otherVCs: "Salesforce Ventures, General Catalyst, Nvidia", keyIndividuals: "Arthur Mensch (CEO)", source: "https://tinyurl.com/mistral-ai-funding", notes: "Major European AI player." },
+            { id:2, companyName: "Perplexity AI", sector: "AI", region: "North America", date: "Jan 2024", amount: "$73.6M funding", valuation: "~$520M", dealType: "Funding", leadVCs: "IVP", otherVCs: "NEA, Jeff Bezos", keyIndividuals: "Aravind Srinivas (CEO)", source: "https://tinyurl.com/perplexity-ai-jan24", notes: "AI-native search alternative." },
+            { id:3, companyName: "Splunk", sector: "Enterprise", region: "North America", date: "Mar 2024 (Closed)", amount: "~$28 Billion", valuation: "N/A", dealType: "M&A", leadVCs: "Cisco (Acquirer)", otherVCs: "N/A", keyIndividuals: "Chuck Robbins (Cisco), Gary Steele (Splunk)", source: "https://tinyurl.com/cisco-splunk-close", notes: "Major acquisition for Cisco's security and observability." },
+            { id:4, companyName: "Instacart (CART)", sector: "Consumer Internet", region: "North America", date: "Sep 2023", amount: "Raised $660M", valuation: "IPO val. ~$10B", dealType: "IPO", leadVCs: "N/A (Went public)", otherVCs: "Sequoia, a16z (Pre-IPO)", keyIndividuals: "Fidji Simo (CEO)", source: "https://tinyurl.com/instacart-ipo-price", notes: "Significant venture-backed tech IPO." },
+            { id:5, companyName: "Northvolt", sector: "Climate Tech", region: "Europe (Sweden)", date: "Jan 2024", amount: "$5B (Debt Financing)", valuation: "N/A", dealType: "Funding", leadVCs: "EIB, NIB, commercial banks", otherVCs: "Goldman Sachs AM, VW (Equity)", keyIndividuals: "Peter Carlsson (CEO)", source: "https://tinyurl.com/northvolt-5b-debt", notes: "European battery giant, critical for EV supply chain." },
+            { id:6, companyName: "Lenskart", sector: "Consumer Internet", region: "Asia (India)", date: "Mar 2023", amount: "$500M", valuation: "N/A", dealType: "Funding", leadVCs: "Abu Dhabi Investment Authority (ADIA)", otherVCs: "KKR, SoftBank", keyIndividuals: "Peyush Bansal (CEO)", source: "https://tinyurl.com/lenskart-adia", notes: "Indian D2C eyewear brand expanding globally." },
+            { id:7, companyName: "Wayve", sector: "AI", region: "Europe (UK)", date: "May 2024", amount: "$1.05B Series C", valuation: "N/A", dealType: "Funding", leadVCs: "SoftBank Group", otherVCs: "Nvidia, Microsoft", keyIndividuals: "Alex Kendall (CEO)", source: "https://techcrunch.com/2024/05/07/uks-wayve-raises-1-05b-led-by-softbank-to-take-on-cruise-and-waymo/", notes: "UK's largest AI fundraise. Focus on 'embodied AI' for self-driving." },
+            { id:8, companyName: "Reddit (RDDT)", sector: "Consumer Internet", region: "North America", date: "Mar 2024", amount: "Raised $748M", valuation: "IPO val. ~$6.4B", dealType: "IPO", leadVCs: "N/A (Went public)", otherVCs: "Tencent, Fidelity, a16z (Pre-IPO)", keyIndividuals: "Steve Huffman (CEO)", source: "https://tinyurl.com/reddit-ipo-launch", notes: "Highly anticipated IPO of a long-standing internet community." }
+            // ... Add all your other deals here
+        ];
+
+        // --- THEMATIC STORIES DATA ---
+        const thematicStories = {
+            "ai_supernova": {
+                title: "The AI Supernova",
+                content: "<p>AI stands as a titan, reshaping industries. From Europe's <strong>Mistral AI</strong> and <strong>Aleph Alpha</strong> to North America's <strong>Perplexity AI</strong> and <strong>Figure AI</strong>, investments are pouring into foundational models, applications, and embodied AI. Giants like <strong>Nvidia, Microsoft, Google, and Salesforce</strong> are not just investors but key ecosystem players.</p><ul><li>Mistral AI: European AI champion.</li><li>Figure AI: Humanoid robotics attracting major tech backers.</li><li>Hugging Face: Central platform for the AI community.</li></ul><p>Key VCs like <strong>a16z, Lightspeed, IVP, SoftBank</strong> are making significant bets, alongside corporate VCs.</p>"
+            },
+            "global_innovation": {
+                title: "Beyond Silicon Valley: A Global Tapestry",
+                content: "<p>Innovation is flourishing globally. Europe sees <strong>Northvolt</strong> (batteries) and <strong>Monzo</strong> (FinTech) making waves. Asia's dynamism is evident with India's <strong>Lenskart</strong> and <strong>Ola Electric</strong>, and China's EV and AI advancements. Latin America's FinTech scene (e.g., <strong>Clara</strong>) is booming, and Africa's potential is highlighted by companies like <strong>Flutterwave</strong>.</p><p>Sovereign wealth funds (e.g., <strong>ADIA, GIC</strong>) and regional VCs (e.g., <strong>Kaszek, Peak XV</strong>) are crucial players.</p>"
+            },
+            "climate_imperative": {
+                title: "Climate Tech's Capital Intensity",
+                content: "<p>Addressing climate change requires massive capital. <strong>Northvolt's</strong> multi-billion dollar raises for battery manufacturing and <strong>Climeworks'</strong> $650M for direct air capture exemplify this. These often involve public-private partnerships and long-term vision from investors like <strong>Goldman Sachs AM, VW, Partners Group, and GIC</strong>.</p>"
+            }
+            // ... Add more themes
+        };
+
+
+        // --- DOM ELEMENTS ---
+        const dealsGrid = document.getElementById('deals-grid');
+        const searchTermInput = document.getElementById('search-term');
+        const regionFilter = document.getElementById('filter-region');
+        const sectorFilter = document.getElementById('filter-sector');
+        const dealTypeFilter = document.getElementById('filter-deal-type');
+        const navButtons = document.querySelectorAll('nav button');
+        const contentSections = document.querySelectorAll('.content-section');
+        const vcListUl = document.getElementById('vc-list');
+        const vcSearchInput = document.getElementById('vc-search');
+        const themeListContainer = document.getElementById('theme-list');
+        const themeContentDisplay = document.getElementById('theme-content-display');
+
+        const modal = document.getElementById('dealModal');
+        const modalBody = document.getElementById('modal-body-content');
+
+        // --- MODAL FUNCTIONS ---
+        function openModal(deal) {
+            modalBody.innerHTML = `
+                <h3>${deal.companyName}</h3>
+                <p><strong>Sector:</strong> ${deal.sector}</p>
+                <p><strong>Region:</strong> ${deal.region}</p>
+                <p><strong>Date:</strong> ${deal.date}</p>
+                <p><strong>Amount:</strong> ${deal.amount}</p>
+                <p><strong>Valuation:</strong> ${deal.valuation}</p>
+                <p><strong>Deal Type:</strong> ${deal.dealType}</p>
+                <p><strong>Lead VC(s)/Acquirer:</strong> ${deal.leadVCs}</p>
+                <p><strong>Other VCs/Participants:</strong> ${deal.otherVCs}</p>
+                <p><strong>Key Individuals:</strong> ${deal.keyIndividuals || 'N/A'}</p>
+                <p><strong>Notes:</strong> ${deal.notes}</p>
+                <p><a href="${deal.source}" target="_blank" class="source-link">Source</a></p>
+            `;
+            modal.style.display = "block";
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+        }
+
+        // Close modal if user clicks outside of it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // --- RENDER FUNCTIONS ---
+        function renderDealCard(deal) {
+            const card = document.createElement('div');
+            card.className = 'deal-card';
+            card.innerHTML = `
+                <h3>${deal.companyName}</h3>
+                <p><strong>Sector:</strong> ${deal.sector}</p>
+                <p><strong>Region:</strong> ${deal.region}</p>
+                <p><strong>Amount:</strong> ${deal.amount} (${deal.dealType})</p>
+                <p><strong>Lead:</strong> ${deal.leadVCs}</p>
+                <p><em>${deal.notes.substring(0,100)}${deal.notes.length > 100 ? '...' : ''}</em></p>
+                <button onclick="openModal(dealsData.find(d => d.id === ${deal.id}))" class="source-link" style="border:none; background:none; padding:0; cursor:pointer;">View Details</button>
+            `;
+            return card;
+        }
+
+        function displayDeals(dealsToDisplay) {
+            dealsGrid.innerHTML = ''; // Clear existing deals
+            dealsToDisplay.forEach(deal => {
+                dealsGrid.appendChild(renderDealCard(deal));
+            });
+        }
+
+        // --- FILTERING LOGIC ---
+        function filterDeals() {
+            const searchTerm = searchTermInput.value.toLowerCase();
+            const selectedRegion = regionFilter.value;
+            const selectedSector = sectorFilter.value;
+            const selectedDealType = dealTypeFilter.value;
+
+            const filtered = dealsData.filter(deal => {
+                const matchesSearch = searchTerm === '' ||
+                    deal.companyName.toLowerCase().includes(searchTerm) ||
+                    deal.sector.toLowerCase().includes(searchTerm) ||
+                    deal.region.toLowerCase().includes(searchTerm) ||
+                    deal.leadVCs.toLowerCase().includes(searchTerm) ||
+                    (deal.otherVCs && deal.otherVCs.toLowerCase().includes(searchTerm)) ||
+                    deal.notes.toLowerCase().includes(searchTerm);
+
+                const matchesRegion = selectedRegion === '' || deal.region === selectedRegion;
+                const matchesSector = selectedSector === '' || deal.sector === selectedSector;
+                const matchesDealType = selectedDealType === '' || deal.dealType === selectedDealType;
+
+                return matchesSearch && matchesRegion && matchesSector && matchesDealType;
+            });
+            displayDeals(filtered);
+        }
+
+        // --- POPULATE FILTERS ---
+        function populateFilters() {
+            const regions = [...new Set(dealsData.map(d => d.region))].sort();
+            const sectors = [...new Set(dealsData.map(d => d.sector))].sort();
+
+            regions.forEach(region => {
+                const option = document.createElement('option');
+                option.value = region;
+                option.textContent = region;
+                regionFilter.appendChild(option);
+            });
+            sectors.forEach(sector => {
+                const option = document.createElement('option');
+                option.value = sector;
+                option.textContent = sector;
+                sectorFilter.appendChild(option);
+            });
+        }
+
+        // --- NAVIGATION LOGIC ---
+        function showSection(sectionId) {
+            contentSections.forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+
+            navButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+            document.getElementById(`nav-${sectionId.split('-')[0]}`).classList.add('active'); // e.g. nav-deals
+
+            // Special handling for VC Insights or Themes if needed on show
+            if (sectionId === 'vc-insights') populateVCList();
+            if (sectionId === 'thematic-stories') populateThemeList();
+        }
+
+        // --- VC INSIGHTS LOGIC ---
+        function getUniqueVCs() {
+            const allVCs = new Set();
+            dealsData.forEach(deal => {
+                if (deal.leadVCs && deal.leadVCs !== "N/A (Went public)" && deal.leadVCs !== "N/A") {
+                    deal.leadVCs.split(',').map(vc => vc.trim()).forEach(vc => {
+                        // Try to clean up "(Acquirer)"
+                        let cleanedVC = vc.replace(/\s*\(Acquirer\)\s*/i, '').trim();
+                        if(cleanedVC) allVCs.add(cleanedVC);
+                    });
+                }
+                if (deal.otherVCs && deal.otherVCs !== "N/A") {
+                     deal.otherVCs.split(',').map(vc => vc.trim()).forEach(vc => {
+                        // Remove common suffixes like (Equity), (Pre-IPO)
+                        let cleanedVC = vc.replace(/\s*\((Equity|Pre-IPO|Strategic)\)\s*/i, '').trim();
+                        if(cleanedVC) allVCs.add(cleanedVC);
+                     });
+                }
+            });
+            return [...allVCs].sort();
+        }
+
+        function populateVCList(searchTerm = '') {
+            vcListUl.innerHTML = '';
+            const uniqueVCs = getUniqueVCs();
+            const filteredVCs = uniqueVCs.filter(vc => vc.toLowerCase().includes(searchTerm.toLowerCase()));
+
+            filteredVCs.forEach(vc => {
+                const li = document.createElement('li');
+                li.textContent = vc;
+                li.onclick = () => {
+                    searchTermInput.value = vc; // Set search term in deals explorer
+                    filterDeals(); // Apply filter
+                    showSection('deals-explorer'); // Switch to deals explorer
+                };
+                vcListUl.appendChild(li);
+            });
+        }
+
+         // --- THEMATIC STORIES LOGIC ---
+        function populateThemeList() {
+            themeListContainer.innerHTML = ''; // Clear previous list
+            const ul = document.createElement('ul');
+            ul.className = 'theme-list';
+            Object.keys(thematicStories).forEach(themeKey => {
+                const li = document.createElement('li');
+                li.textContent = thematicStories[themeKey].title;
+                li.onclick = () => displayThemeContent(themeKey);
+                ul.appendChild(li);
+            });
+            themeListContainer.appendChild(ul);
+
+            // Display first theme by default if any
+            if (Object.keys(thematicStories).length > 0) {
+                displayThemeContent(Object.keys(thematicStories)[0]);
+                 // Highlight the first theme in the list
+                const firstThemeLi = themeListContainer.querySelector('li');
+                if (firstThemeLi) {
+                    themeListContainer.querySelectorAll('li').forEach(item => item.style.backgroundColor = 'transparent');
+                    firstThemeLi.style.backgroundColor = '#e9ecef';
+                }
+            } else {
+                themeContentDisplay.innerHTML = '<p>No themes available.</p>';
+            }
+        }
+
+        function displayThemeContent(themeKey) {
+            const theme = thematicStories[themeKey];
+            if (theme) {
+                themeContentDisplay.innerHTML = `
+                    <h2>${theme.title}</h2>
+                    <div>${theme.content}</div>
+                `;
+                 // Highlight selected theme in the list
+                themeListContainer.querySelectorAll('li').forEach(li => {
+                    if (li.textContent === theme.title) {
+                        li.style.backgroundColor = '#e9ecef'; // Or some other highlight style
+                    } else {
+                        li.style.backgroundColor = 'transparent';
+                    }
+                });
+            } else {
+                themeContentDisplay.innerHTML = '<p>Select a theme to read.</p>';
+            }
+        }
+
+
+        // --- EVENT LISTENERS ---
+        searchTermInput.addEventListener('input', filterDeals);
+        regionFilter.addEventListener('change', filterDeals);
+        sectorFilter.addEventListener('change', filterDeals);
+        dealTypeFilter.addEventListener('change', filterDeals);
+        vcSearchInput.addEventListener('input', (e) => populateVCList(e.target.value));
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            populateFilters();
+            displayDeals(dealsData); // Display all deals initially
+            showSection('deals-explorer'); // Show deals explorer by default
+            // populateVCList(); // Populate VCs for the VC tab
+            // populateThemeList(); // Populate themes for the themes tab
+        });
+    </script>
+</body>
+</html>
